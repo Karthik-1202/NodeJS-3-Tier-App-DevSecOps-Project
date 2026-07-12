@@ -50,8 +50,8 @@ jobs:
       - name: Run Checkov Terraform scan
         run: |
           checkov -d . \ 
-            -- framework terraform \
-            -- output json > checkov-terraform-report.json || true
+            --framework terraform \
+            --output json > checkov-terraform-report.json || true
       - name: Upload Checkov Terraform Report
         uses: actions/upload-artifact@v4
         with:
@@ -75,8 +75,8 @@ jobs:
       - name: Run Checkov Kubernetes scan
         run: |
           checkov -d . \ 
-            -- framework kubernetes \
-            -- output json > checkov-k8s-report.json || true
+            --framework kubernetes \
+            --output json > checkov-k8s-report.json || true
       - name: Upload Checkov Kubernetes Report
         uses: actions/upload-artifact@v4
         with:
@@ -100,8 +100,8 @@ jobs:
       - name: Run Checkov dockerfile scan
         run: |
           checkov -d . \ 
-            -- framework dockerfile \
-            -- output json > checkov-dockerfile-report.json || true
+            --framework dockerfile \
+            --output json > checkov-dockerfile-report.json || true
       - name: Upload Checkov dockerfile Report
         uses: actions/upload-artifact@v4
         with:
