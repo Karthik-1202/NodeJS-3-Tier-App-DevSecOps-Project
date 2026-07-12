@@ -49,7 +49,7 @@ jobs:
         run: pip install checkov
       - name: Run Checkov Terraform scan
         run: |
-          checkov -d . \ 
+          checkov -d . \
             --framework terraform \
             --output json > checkov-terraform-report.json || true
       - name: Upload Checkov Terraform Report
@@ -74,7 +74,7 @@ jobs:
         run: pip install checkov
       - name: Run Checkov Kubernetes scan
         run: |
-          checkov -d . \ 
+          checkov -d . \
             --framework kubernetes \
             --output json > checkov-k8s-report.json || true
       - name: Upload Checkov Kubernetes Report
@@ -99,7 +99,7 @@ jobs:
         run: pip install checkov
       - name: Run Checkov dockerfile scan
         run: |
-          checkov -d . \ 
+          checkov -d . \
             --framework dockerfile \
             --output json > checkov-dockerfile-report.json || true
       - name: Upload Checkov dockerfile Report
