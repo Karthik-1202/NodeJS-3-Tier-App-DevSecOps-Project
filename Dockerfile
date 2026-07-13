@@ -20,7 +20,7 @@ COPY --from=client-builder /usr/src/app/client/public ./public
 
 ENV NODE_ENV=production
 
-RUN addground -S appgroup && adduser -S appuser -G appgroup
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 RUN chowm -R appuser:appgroup /usr/src/app
 
 USER appuser
