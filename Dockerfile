@@ -21,7 +21,7 @@ COPY --from=client-builder /usr/src/app/client/public ./public
 ENV NODE_ENV=production
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-RUN chowm -R appuser:appgroup /usr/src/app
+RUN chown -R appuser:appgroup /usr/src/app
 
 USER appuser
 
