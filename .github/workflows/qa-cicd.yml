@@ -463,6 +463,28 @@ jobs:
           tags: |
             12karthik02/my-project:${{ github.sha }}
             12karthik02/my-project:latest
+
+      - name: Generate source SBOM 
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx.json
+          output-file: source-sbom.spdc.json
+          upload-artifact: true
+
+      - name: Generate Image SBOM
+        uses: anchore/sbom-actions@v0
+        with:
+          image: 12karthik02/my-project:${{ github.sha }}
+          format: spdx-json
+          output-file: image-sbom.spdx.json
+          upload-artifact: true
+
+      - name: Push Image
+        uses: docker/build-push-action@v7
+        with:
+          push: true
+          tags: |
     
           
           
