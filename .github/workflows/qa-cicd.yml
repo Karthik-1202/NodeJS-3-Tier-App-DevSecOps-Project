@@ -473,7 +473,7 @@ jobs:
           upload-artifact: true
 
       - name: Generate Image SBOM
-        uses: anchore/sbom-actions@v0
+        uses: anchore/sbom-action@v0
         with:
           image: 12karthik02/my-project:${{ github.sha }}
           format: spdx-json
