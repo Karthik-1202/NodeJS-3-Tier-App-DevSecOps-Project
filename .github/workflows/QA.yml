@@ -468,7 +468,7 @@ jobs:
         uses: anchore/sbom-action@v0
         with:
           path: .
-          format: spdx.json
+          format: spdx-json
           output-file: source-sbom.spdc.json
           upload-artifact: true
 
