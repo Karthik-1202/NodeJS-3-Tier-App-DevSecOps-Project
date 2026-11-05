@@ -1,5 +1,6 @@
 name: Enterprise DevSecOps CICD pipeline
 on: 
+  workflow_dispatch:
   push:
     branches:
       - QA
