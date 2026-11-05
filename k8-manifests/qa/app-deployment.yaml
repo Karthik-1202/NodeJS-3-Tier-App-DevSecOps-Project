@@ -17,7 +17,7 @@ spec:
       - name: dockerhub-regcred
       containers:
       - name: nodejs-app
-        image: 12karthik02/my-project:607cfa1f94259cc4daec3777a0ab87b64e8d4f28
+        image: 12karthik02/my-project:73da64eee96a5cd1450fcc5c4c9f1b8eb31243cc
         ports:
         - containerPort: 5000
         env:
