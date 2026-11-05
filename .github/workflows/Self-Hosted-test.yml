@@ -1,0 +1,57 @@
+
+name: Self Hosted Runner Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-runner:
+    name: Execute on DockerVM
+    runs-on: [self-hosted, linux, x64]
+
+    steps:
+      - name: 1. Identify Runner
+        run: |
+          echo "Hostname:"
+          hostname
+
+          echo "Current User:"
+          whoami
+
+          echo "Working Directory:"
+          pwd
+
+      - name: 2. Check Operating System
+        run: |
+          cat /etc/os-release
+
+      - name: 3. Check VM Resources
+        run: |
+          echo "CPU:"
+          nproc
+
+          echo "Memory:"
+          free -h
+
+          echo "Disk:"
+          df -h
+
+      - name: 4. Verify Installed Tools
+        run: |
+          git --version
+          curl --version
+          jq --version
+
+      - name: 5. Verify Runner Environment
+        run: |
+          echo "Runner Name: $RUNNER_NAME"
+          echo "Runner OS: $RUNNER_OS"
+          echo "Runner Architecture: $RUNNER_ARCH"
+          echo "Runner Workspace: $GITHUB_WORKSPACE"
+
+      - name: 6. Test Successful Execution
+        run: |
+          echo "=================================="
+          echo "SELF-HOSTED RUNNER TEST SUCCESSFUL"
+          echo "Executed on DockerVM"
+          echo "=================================="
