@@ -515,7 +515,7 @@ jobs:
           git push origin QA
 
   deploy-to-minikube:
-    name: Deploy to Minikube
+    name: Deploy to Minikube Cluster
     needs: update-qa-manifest
     runs-on: [self-hosted, windows, x64, minikube-windows-runner]
 
