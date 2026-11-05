@@ -14,7 +14,7 @@ spec:
         app: nodejs-app
     spec:
       imagePullSecrets:
-      - name: regcred
+      - name: dockerhub-regcred
       containers:
       - name: nodejs-app
         image: 12karthik02/my-project:665f1419522e6aa6bba65eaa365784222445708a
