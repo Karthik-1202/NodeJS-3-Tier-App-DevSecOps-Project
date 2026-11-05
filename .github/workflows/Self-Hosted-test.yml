@@ -2,7 +2,9 @@
 name: Self Hosted Runner Test
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - QA
 
 jobs:
   test-runner:
