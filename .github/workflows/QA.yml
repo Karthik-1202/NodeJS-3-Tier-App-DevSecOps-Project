@@ -551,41 +551,83 @@ jobs:
             throw "Failed to create or verify QA namespace"
           }
 
-      - name: Deploy Kubernetes manifests
+      
+      - name: Verify Kubernetes Secrets
         shell: powershell
         run: |
-          kubectl apply -f k8-manifests/qa/ -n qa
+          kubectl get secret mysql-secret -n qa
           if ($LASTEXITCODE -ne 0) {
-            throw "Kubernetes manifest deployment failed"
+            throw "mysql-secret is missing"
           }
 
-      - name: Verify deployment rollout
+          kubectl get secret dockerhub-regcred -n qa
+          if ($LASTEXITCODE -ne 0) {
+            throw "dockerhub-regcred is missing"
+          }
+
+      - name: Deploy MySQL Server
         shell: powershell
         run: |
-          $deployments = kubectl get deployments -n qa -o name
+          kubectl apply -f k8-manifests/qa/mysql/mysql-service.yaml -n qa
+          if ($LASTEXITCODE -ne 0) {
+            throw "MySQL Service creation failed"
+          }
+
+          kubectl apply -f k8-manifests/qa/mysql/mysql-statefulset.yaml -n qa
+          if ($LASTEXITCODE -ne 0) {
+            throw "MySQL StatefulSet creation failed"
+          }
+
+      - name: Wait for MySQL Availability
+        shell: powershell
+        run: |
+          kubectl rollout status statefulset/mysql -n qa --timeout=300s
 
           if ($LASTEXITCODE -ne 0) {
-            throw "Unable to retrieve deployments"
+            kubectl get pods -n qa
+            kubectl describe pod mysql-0 -n qa
+            kubectl logs mysql-0 -n qa
+            throw "MySQL is unavailable. Stopping application deployment."
           }
 
-          if (-not $deployments) {
-            throw "No deployments found in QA namespace"
-          }
+          Write-Host "MySQL StatefulSet is ready."
 
-          foreach ($deployment in $deployments) {
-            Write-Host "Checking rollout: $deployment"
-            kubectl rollout status $deployment -n qa --timeout=180s
+          kubectl get service mysql -n qa
+          kubectl get endpoints mysql -n qa
 
-            if ($LASTEXITCODE -ne 0) {
-              throw "Deployment rollout failed: $deployment"
-            }
-          }
-
-      - name: Verify deployed resources
+      - name: Deploy QA Application
         shell: powershell
         run: |
+          kubectl apply -f k8-manifests/qa/app-deployment.yaml -n qa
+          if ($LASTEXITCODE -ne 0) {
+            throw "Application deployment failed"
+          }
+
+          kubectl apply -f k8-manifests/qa/app-svc.yaml -n qa
+          if ($LASTEXITCODE -ne 0) {
+            throw "Application service deployment failed"
+          }
+
+          kubectl apply -f k8-manifests/qa/app-ingress.yaml -n qa
+          if ($LASTEXITCODE -ne 0) {
+            throw "Application ingress deployment failed"
+          }
+
+      - name: Verify Application Rollout
+        shell: powershell
+        run: |
+          kubectl rollout status deployment/nodejs-app -n qa --timeout=180s
+
+          if ($LASTEXITCODE -ne 0) {
+            kubectl get pods -n qa
+            kubectl describe pods -n qa
+            kubectl logs deployment/nodejs-app -n qa
+            throw "Application rollout failed"
+          }
+
           kubectl get all -n qa
           kubectl get pvc -n qa
+
           
           
 
