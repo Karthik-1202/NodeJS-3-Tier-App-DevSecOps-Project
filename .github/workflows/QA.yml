@@ -552,7 +552,7 @@ jobs:
           }
 
       
-      - name: Verify Kubernetes Secrets
+      - name: Verify Docker & MYSQL Secrets
         shell: powershell
         run: |
           kubectl get secret mysql-secret -n qa
