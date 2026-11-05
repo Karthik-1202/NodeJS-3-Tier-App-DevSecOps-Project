@@ -513,7 +513,79 @@ jobs:
           git add k8-manifests/qa/app-deployment.yaml
           git commit -m "Update QA image to ${GITHUB_SHA} [skip ci]" || echo "No changes to commit"
           git push origin QA
-            
+
+  deploy-to-minikube:
+    name: Deploy to Minikube
+    needs: update-qa-manifest
+    runs-on: [self-hosted, windows, x64, minikube-windows-runner]
+
+    steps:
+      - name: Checkout latest QA branch
+        uses: actions/checkout@v4
+        with:
+          ref: QA
+
+      - name: Verify Minikube cluster
+        shell: powershell
+        run: |
+          minikube status
+          if ($LASTEXITCODE -ne 0) {
+            throw "Minikube cluster is not running"
+          }
+
+          $context = kubectl config current-context
+          if ($LASTEXITCODE -ne 0 -or $context.Trim() -ne "minikube") {
+            throw "Kubernetes context is not Minikube. Aborting deployment."
+          }
+
+          kubectl get nodes
+          if ($LASTEXITCODE -ne 0) {
+            throw "Unable to connect to Minikube cluster"
+          }
+
+      - name: Create QA namespace
+        shell: powershell
+        run: |
+          kubectl create namespace qa --dry-run=client -o yaml | kubectl apply -f -
+          if ($LASTEXITCODE -ne 0) {
+            throw "Failed to create or verify QA namespace"
+          }
+
+      - name: Deploy Kubernetes manifests
+        shell: powershell
+        run: |
+          kubectl apply -f k8-manifests/qa/ -n qa
+          if ($LASTEXITCODE -ne 0) {
+            throw "Kubernetes manifest deployment failed"
+          }
+
+      - name: Verify deployment rollout
+        shell: powershell
+        run: |
+          $deployments = kubectl get deployments -n qa -o name
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Unable to retrieve deployments"
+          }
+
+          if (-not $deployments) {
+            throw "No deployments found in QA namespace"
+          }
+
+          foreach ($deployment in $deployments) {
+            Write-Host "Checking rollout: $deployment"
+            kubectl rollout status $deployment -n qa --timeout=180s
+
+            if ($LASTEXITCODE -ne 0) {
+              throw "Deployment rollout failed: $deployment"
+            }
+          }
+
+      - name: Verify deployed resources
+        shell: powershell
+        run: |
+          kubectl get all -n qa
+          kubectl get pvc -n qa
           
           
 
